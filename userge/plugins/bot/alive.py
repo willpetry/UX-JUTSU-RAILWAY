@@ -264,7 +264,7 @@ class Bot_Alive:
     @staticmethod
     def alive_default_imgs() -> str:
         alive_imgs = [
-            "https://telegra.ph/file/11123ef7dff2f1e19e79d.jpg",
+            "https://telegra.ph/file/64e0fa12384e86bc3a764.jpg",
             "https://i.imgur.com/uzKdTXG.jpg",
             "https://telegra.ph/file/6ecab390e4974c74c3764.png",
             "https://telegra.ph/file/995c75983a6c0e4499b55.png",
