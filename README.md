@@ -62,7 +62,7 @@
 <br>
 
 * With Railway<br>
-[![Deploy on Railway](https://railway.app/button.svg)]()
+[![Deploy on Railway](https://railway.app/button.svg)](https://telegra.ph/How-to-deploy-UX-on-Railway-12-12)
 
 > **NOTE** : your can fill other vars as your need and they are optional. ([Heroku] settings -> reveal config vars) ([Railway] -> variables)
 * First click The Button Above.
