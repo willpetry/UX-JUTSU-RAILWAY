@@ -64,7 +64,7 @@
 * With Railway<br>
 [![Deploy on Railway](https://railway.app/button.svg)](https://telegra.ph/How-to-deploy-UX-on-Railway-12-12)
 
-> **NOTE** : your can fill other vars as your need and they are optional. ([Heroku] settings -> reveal config vars) ([Railway] -> variables)
+> **NOTE** : ([Heroku] settings -> reveal config vars) ([Railway] -> variables)
 * First click The Button Above.
 * Fill `API_ID`, `API_HASH`, `DATABASE_URL`, `LOG_CHANNEL_ID`, `HEROKU_APP_NAME` and `HEROKU_API_KEY` (**required**)
 * Then fill Dual Mode vars : `OWNER_ID`, `BOT_TOKEN` and `HU_STRING_SESSION`
