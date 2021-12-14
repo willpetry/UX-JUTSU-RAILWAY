@@ -5,10 +5,20 @@ from time import time
 from git import Repo
 from git.exc import GitCommandError
 
-from userge import Config, Message, pool, userge
+from userge import Config, Message, get_collection, pool, userge
+from userge.utils import runcmd
 
 LOG = userge.getLogger(__name__)
 CHANNEL = userge.getCLogger(__name__)
+
+FROZEN = get_collection("FROZEN")
+UPDATE_MSG = get_collection("UPDATE_MSG")
+
+
+async def _init():
+    start = userge.uptime
+    if start == "0h, 0m, 1s":
+        await CHANNEL.log("Bot started...")
 
 
 @userge.on_cmd(
@@ -18,6 +28,8 @@ CHANNEL = userge.getCLogger(__name__)
         "flags": {
             "-pull": "pull updates",
             "-branch": "Default is -alpha",
+            "-pr": "Userge-Plugins repo updates",
+            "-prp": "Userge-Plugins repo pull updates",
         },
         "usage": (
             "{tr}update : check updates from default branch\n"
@@ -34,14 +46,17 @@ async def check_update(message: Message):
     await message.edit("`Checking for updates, please wait....`")
     if Config.HEROKU_ENV:
         await message.edit(
-            "**Heroku App detected !**, Updates have been disabled for Safety.\n"
-            "Your Bot Will Auto Update when Heroku restart"
+            "**Heroku App detected !** Updates have been disabled for Safety.\n"
+            f"To check changelog do `{Config.CMD_TRIGGER}fetchup`, and to pull updates do `{Config.CMD_TRIGGER}restart -h`."
         )
         return
     flags = list(message.flags)
     pull_from_repo = False
     push_to_heroku = False
     branch = "alpha"
+    u_repo = Config.UPSTREAM_REPO
+    u_repo = u_repo.replace("/", " ")
+    git_u_n = u_repo.split()[2]
     if "pull" in flags:
         pull_from_repo = True
         flags.remove("pull")
@@ -51,6 +66,13 @@ async def check_update(message: Message):
             return
         # push_to_heroku = True
         # flags.remove("push")
+    if "pr" in flags:
+        branch = "master"
+        out = _get_updates_pr(git_u_n, branch)
+    if "prp" in flags:
+        await message.edit("Updating <b><u>Userge-Plugins</u></b>...", log=__name__)
+        await runcmd("bash run")
+        asyncio.get_event_loop().create_task(userge.restart())
     if len(flags) == 1:
         branch = flags[0]
     repo = Repo()
@@ -87,10 +109,18 @@ async def check_update(message: Message):
                 f"**PULLED update from [{branch}]:\n\n📄 CHANGELOG 📄**\n\n{out}"
             )
             if not push_to_heroku:
-                await message.edit(
+                update = await message.edit(
                     "**USERGE-X Successfully Updated!**\n"
                     "`Now restarting... Wait for a while!`",
-                    del_in=3,
+                )
+                be_update = time()
+                await UPDATE_MSG.update_one(
+                    {"_id": "UPDATE_MSG"},
+                    {"$set": {"message": f"{update.chat.id}/{update.message_id}"}},
+                    upsert=True,
+                )
+                await UPDATE_MSG.update_one(
+                    {"_id": "UPDATE_MSG"}, {"$set": {"time": be_update}}, upsert=True
                 )
                 asyncio.get_event_loop().create_task(userge.restart(True))
         elif push_to_heroku:
@@ -121,7 +151,20 @@ def _get_updates(repo: Repo, branch: str) -> str:
     return out
 
 
+def _get_updates_pr(git_u_n: str, branch: str) -> str:
+    pr_up = f"https://github.com/{git_u_n}/Userge-Plugins"
+    repo = Repo()
+    repo.remote(pr_up).fetch(branch)
+    upst = pr_up.rstrip("/")
+    out = ""
+    upst = pr_up.rstrip("/")
+    for i in repo.iter_commits(f"HEAD..{pr_up}/{branch}"):
+        out += f"🔨 **#{i.count()}** : [{i.summary}]({upst}/commit/{i}) 👷 __{i.author}__\n\n"
+    return out
+
+
 async def _pull_from_repo(repo: Repo, branch: str) -> None:
+    await FROZEN.drop()
     repo.git.checkout(branch, force=True)
     repo.git.reset("--hard", branch)
     repo.remote(Config.UPSTREAM_REMOTE).pull(branch, force=True)
