@@ -13,4 +13,4 @@ from userge import Config, Message, userge
 async def see_repo(message: Message):
     """see repo"""
     output = f"• **repo** : [USERGE-X]({Config.UPSTREAM_REPO})"
-    await message.edit(output)
+    await message.edit(output, disable_web_page_preview=True)
