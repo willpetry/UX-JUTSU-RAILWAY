@@ -83,6 +83,6 @@ async def neo_image():
         photo.save(new_pic, format="PNG")
         new_pic.name = "NeoFetch.png"
     else:
-        photo.save(new_pic, format="JPG")
-        new_pic.name = "NeoFetch.jpg"
+        photo.save(new_pic, format="PNG")
+        new_pic.name = "NeoFetch.png"
     return new_pic
