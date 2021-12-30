@@ -50,7 +50,7 @@ _checkDefaultVars() {
         [WORKERS]=0
         [PREFERRED_LANGUAGE]="en"
         [DOWN_PATH]="downloads"
-        [UPSTREAM_REMOTE]="upstream"
+#        [UPSTREAM_REMOTE]="upstream"
         [UPSTREAM_REPO]="https://github.com/Anonymousx97/UX-JUTSU-RAILWAY"
         [LOAD_UNOFFICIAL_PLUGINS]=true
         [CUSTOM_PLUGINS_REPO]=""
