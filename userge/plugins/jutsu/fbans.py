@@ -157,7 +157,10 @@ async def fban_(message: Message):
         user = split_[0]
         if not user.isdigit() and not user.startswith("@"):
             user = extract_id(message.text)
-        reason = split_[1]
+        if len(split_) == 2:
+            reason = split_[1]
+        else:
+            reason = "not specified"
     else:
         user = message.reply_to_message.from_user.id
         reason = input
@@ -222,6 +225,7 @@ async def fban_(message: Message):
             await userge.send_message(
                 chat_id,
                 f"/fban {user} {reason}",
+                disable_web_page_preview=True,
             )
         except UserBannedInChannel:
             pass
@@ -415,7 +419,7 @@ async def fban_p(message: Message):
             msg_id=proof,
             reason=reason,
         )
-        reported = "</b>and <b>reported "
+        reported = "</b> and <b>reported "
     else:
         reported = ""
     async for data in FED_LIST.find():
